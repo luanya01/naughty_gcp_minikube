@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: casdoor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: casdoor
+  template:
+    metadata:
+      labels:
+        app: casdoor
+    spec:
+      containers:
+      - name: casdoor
+        image: casbin/casdoor:latest
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: casdoor-config-volume
+          mountPath: /conf/app.conf
+          subPath: app.conf
+      volumes:
+      - name: casdoor-config-volume
+        configMap:
+          name: casdoor-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: casdoor-service
+spec:
+  type: ClusterIP
+  selector:
+    app: casdoor
+  ports:
+  - port: 7778
+    targetPort: 8000
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: casdoor-config
+data:
+  app.conf: |
+    appname = casdoor
+    httpport = 8000
+    # 👇 1. 改為 prod 模式，避免 PID 1 自動重啟導致 K8s 判定 Error
+    runmode = prod
+    SessionOn = true
+    copyrequestbody = true
+    driverName = mysql
+    # 👇 2. 優化連線字串，增加穩定性
+    dataSourceName = root:casdoor_pwd_123@tcp(35.229.227.162:3306)/casdoor?parseTime=true&loc=Local&allowNativePasswords=true
+    dbName = casdoor
+    authState = "casdoor"
