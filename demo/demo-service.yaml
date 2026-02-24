@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-first-service
+spec:
+  type: NodePort            # 告訴 K8s 我們要對外開一個 Port
+  selector:
+    app: web-server         # 魔法在這裡！這會自動綁定剛剛 Deployment 裡設定的 label
+  ports:
+    - port: 80              # Service 自己的 Port
+      targetPort: 80        # 轉發到後面容器的 Port (Nginx 預設是 80)
+      nodePort: 30080       # 我們指定對外開的實體 Port (必須介於 30000-32767 之間)

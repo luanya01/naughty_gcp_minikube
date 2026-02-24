@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-first-backend  # 這是這組部署任務的名稱
+spec:
+  replicas: 2             # 我們要求 K8s 幫我們保持 "2個" 相同的容器同時運行
+  selector:
+    matchLabels:
+      app: web-server
+  template:               # 下面是定義真正的 Pod (容器的載體) 長什麼樣子
+    metadata:
+      labels:
+        app: web-server
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:latest   # 使用 Docker Hub 上的 nginx 映像檔
+        ports:
+        - containerPort: 80   # 容器內部開通的 Port
