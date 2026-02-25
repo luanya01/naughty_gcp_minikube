@@ -1,0 +1,63 @@
+# 由於原先fastapi會使用hostPath掛載設定檔，但minikube無法使用hostPath，因此改用ConfigMap"
+# 並且將原本的settings.toml和database.toml使用以下指令寫道configMap
+# kubectl create configmap fastapi-config --from-file=settings.toml --from-file=database.toml
+
+
+# 1. FastAPI 部署 (Deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+      - name: fastapi
+        image: luanya01/naughty-fastapi:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        # A. 掛載整合後的設定檔
+        - name: app-config-volume
+          mountPath: /app/settings.toml
+          subPath: settings.toml
+        - name: app-config-volume
+          mountPath: /app/database.toml
+          subPath: database.toml
+          
+        # B. 掛載 Log 目錄
+        - name: log-storage
+          mountPath: /app/logs
+          
+      volumes:
+      # 👇 改用 ConfigMap，不再依賴容易出錯的 hostPath
+      - name: app-config-volume
+        configMap:
+          name: fastapi-config
+          
+      # 👇 Logs 暫時用 emptyDir (Pod 刪除時會清空)。
+      # (因為在 Minikube 裡 hostPath 會寫到 Minikube 容器裡，GCP VM 一樣看不到)
+      - name: log-storage
+        emptyDir: {}
+
+---
+# 2. FastAPI 服務 (Service)
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+spec:
+  type: ClusterIP
+  selector:
+    app: fastapi
+  ports:
+  - port: 7779
+    targetPort: 8000
