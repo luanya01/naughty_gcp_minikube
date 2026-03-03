@@ -13,7 +13,7 @@
 
 2. **Casdoor 身分認證系統 (`demo-casdoor.yaml`)**
    - 部署開源 IAM (Identity and Access Management) 系統 Casdoor，用於單一登入 (SSO) 或是會員驗證功能。
-   - 利用名為 `casdoor-config` 的 ConfigMap 掛載 `app.conf`，連線至外部的 MySQL 資料庫 (`35.229.227.162:3306`)。
+   - 利用名為 `casdoor-config` 的 ConfigMap 掛載 `app.conf`，連線至外部的 MySQL 資料庫 (`123.123.123.123:3306`)。
    - 透過 `ClusterIP` 服務在叢集內部對外提供 Port `7778` (轉發至容器內部 `8000`)。
 
 3. **FastAPI 後端應用 (`fastapi.yaml`)**
