@@ -52,6 +52,6 @@ data:
     copyrequestbody = true
     driverName = mysql
     # 👇 2. 優化連線字串，增加穩定性
-    dataSourceName = root:casdoor_pwd_123@tcp(35.229.227.162:3306)/casdoor?parseTime=true&loc=Local&allowNativePasswords=true
+    dataSourceName = root:xxxxxxx@tcp(123.123.123.123:3306)/casdoor?parseTime=true&loc=Local&allowNativePasswords=true
     dbName = casdoor
     authState = "casdoor"
